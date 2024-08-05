@@ -5,6 +5,9 @@ Godot 提供了四种游戏编程语言：GDScript、C# 以及通过 GDExtension
 你可以在一个项目中使用多种语言。例如，在团队中，你可以在 GDScript 中编写游戏逻辑，因为它编写起来很快，并使用 C# 或 C++ 来实现复杂的算法并最大限度地提高其性能。或者你可以使用 GDScript 或 C# 编写所有内容。由你自己决定。
 
 如果你是初学者，推荐从 GDScript 入手。GDScript的语法类似python，容易上手。
+个人极度推荐学习UC Berkeley的[CS61A](https://web.archive.org/web/20240105210336/https://inst.eecs.berkeley.edu/~cs61a/sp21/)课程，可以对编程语言有一个比较系统的了解。
+## 调试代码
+打开godot引擎，在项目中创建一个Node2D节点，给其加脚本，将除了函数的代码写在_ready下，函数代码与ready并列
 ## 标识符
 标识符就是我们编程的时候使用的“名字“ , 给类、接口、**方法（函数）、变量、常量名**，包名等起名字的字符序列
 
@@ -17,7 +20,6 @@ Godot 提供了四种游戏编程语言：GDScript、C# 以及通过 GDExtension
 后面的内容会再提及，这里就提一下
 ## 类型与变量
 类型一般分为两种，内置类型和引用类型。这里的“基本内置类型”即基本类型，除基本类型以外的所有类型都是引用类型。在函数传参时这两种类型会表现出不同的行为。
-怎么区分基本类型和引用类型：引用类型一般都类似于一个“容器”，其中会包括很多基本类型。
 ### 基本内置类型
 #### null
 `null` 是一个空数据类型，既不包含任何信息，也不能赋值为其他任何值。
@@ -35,7 +37,7 @@ var string2 = 'World!'  #单引号也可以
 var result = string1 + string2
 print(result)  # 输出: Hello, World!
 ```
-在gdscript中，因为存在类型自动推断，所以我们不必记住各种类型的名称。
+在gdscript中，因为存在类型自动推断，所以我们不必记住各种类型的名称（？）。
 ### 变量创建
 变量用`var`关键字创建，可以在初始化的时候赋一个值
 ```gdscript
@@ -43,6 +45,12 @@ var a # 初始化（创建）a变量，a的初始值默认是null
 var b = 5 # 初始化的同时赋值
 var c = 3.8
 var d = b + c
+```
+### 常量
+常量常用于一些在程序中一些不变的值，比如重力加速度，比如点按键人物速度的增加量，如果直接写数字，则在工程中若人物速度需要修改则需要花费很大精力，一般设为一个常量
+```gdscript
+const var gravity = 9.8
+const var velocity = 100
 ```
 ### 内置向量类型
 #### Vector2
@@ -64,6 +72,7 @@ var c = arr[arr.size() - 1] # This is 3.
 var d = arr[-1] # Same as the previous line, but shorter.
 arr[0] = "Hi!" # Replacing value 1 with "Hi!".
 arr.append(4) # Array is now ["Hi!", 2, 3, 4].
+arr.pop_back() # Array is now ["Hi!", 2, 3]
 ```
 #### 字典(Dictionary)
 键值对的集合，冒号前为键(key)，冒号后为值(value)
@@ -79,6 +88,21 @@ d = {
 ```
 #### 信号(Signal)
 略，在后面详细讲
+### 基本类型和引用类型的区别
+```gdscript
+var b = 1
+var a = b
+b = b + 1
+print(b) # 2
+print(a) # 1
+# 以上为基本类型
+
+var c = []
+var d = c
+d.append(3)
+print(c) # [3]
+以上为引用类型
+```
 ### 指定类型
 ```gdscript
 var a: Array[int]
@@ -106,6 +130,32 @@ func square(a): return a * a
 func my_int_function() -> int:
     return 0
 ```
+### 函数的作用域
+全局变量和局部变量
+#### 基本类型
+```gdscript
+var a = 5
+var b = 5
+
+func my_func(a,b):
+    a = 6
+    return a + b
+
+print(a) # 5
+```
+不要这样写代码！
+在这里，a和b相当于是被复制进去了
+#### 引用类型
+```gdscript
+var a = [1,2,3]
+
+func my_func(b):
+    b.push_back(4)
+    return b
+
+var c = my_func(a)
+print(c)
+```
 ### 引用函数
 就 Callable 对象而言，函数是其第一类对象。通过名称引用函数而不调用它，会自动生成指向该函数的 Callable。这可用于将函数作为参数传递。
 ```gdscript
@@ -116,3 +166,122 @@ func map(arr: Array, function: Callable) -> Array:
     return result
 ```
 可调用体**必须**使用 `call` 方法进行调用。你不能直接使用 () 运算符。
+## 语句与流程控制
+### 表达式和语句
+表达式是运算符和操作数的有序排列
+```gdscript
+2 + 2 # Binary operation.
+-5 # Unary operation.
+x # Identifier representing variable or constant.
+x[4] # Subscript access.
+x > 2 or x < 5 # Comparisons and logic operators.
+x == y + 2 # Equality test.
+do_something() # Function call.
+[1, 2, 3] # Array definition.
+{A = 1, B = 2} # Dictionary definition.
+preload("res://icon.png") # Preload builtin function.
+```
+有效的表达式被写到程序里就成为语句。
+### 条件句
+条件句通过使用 `if`/`else`/`elif` 语法创建。条件中的括号可写可不写。
+```gdscript
+if (expression):
+    statement(s)
+elif (expression):
+    statement(s)
+else:
+    statement(s)
+```
+这里的expression一般是bool类型，一般是表判断含义的表达式
+```gdscript
+if (a > 2):
+    a += 2
+elif (a < = -2):
+    a -= 2
+else:
+    pass
+```
+短的语句可以与条件句写在同一行内
+```gdscipt
+if 1 + 1 == 2: return 2 + 2
+else:
+    var x = 3 + 3
+    return x
+```
+#### 三元表达式
+类似于C语言中`a ? b : c`的语法
+```gdscript
+var x = (value1) if (expression) else (value2)# 如果expression是true，那表达式的值为value1，否则为value2
+y += 3 if y < 10 else -1
+```
+可以写的更长
+```gdscript
+var fruit = (
+        "apple" if count == 2
+        else "pear" if count == 1
+        else "banana" if count == 0
+        else "orange"
+)
+```
+但是可读性会降低所以不建议这么写
+#### `in`
+想要检查某个值是否包含在某些容器之中时，可以通过 if 语句与 in 操作符组合来实现：
+```gdscript
+var text = "abc"
+if 'a' in text:
+    print(There is an 'a' in the text.)
+
+var arr = ['apple','banana','peach','shxt']
+if 'shxt' in arr:
+    arr.erase('shxt') # remove 'shxt' from the array
+```
+(array官方文档)[./https://docs.godotengine.org/zh-cn/4.x/classes/class_array.html#class-array-method-erase]
+### 循环句
+#### `while`
+一般的循环通过 while 语法创建，可以使用 break 来跳出整个循环，或者使用 continue 来跳出当前批循环并进入下一轮的循环当中（会在该轮循环将该关键字下方所有在该循环体内的语句全部跳过）：
+```gdscript
+while (expression):
+    statements
+
+while (i > 1 and i < 9):
+    i += 1
+```
+#### `for`
+要遍历一个容器，例如数组或表，使用 `for` 循环。遍历字典时，键被存储在循环变量中。
+```gdscript
+for x in [5, 7, 11]:
+    statement # Loop iterates 3 times with 'x' as 5, then 7 and finally 11.
+var dict = {"a": 0, "b": 1, "c": 2}
+for i in dict:
+    print(dict[i]) # Prints 0, then 1, then 2.
+
+# range 左闭右开
+
+for i in range(3):
+    statement # Similar to [0, 1, 2] but does not allocate an array.
+for i in range(1, 3):
+    statement # Similar to [1, 2] but does not allocate an array.
+for i in range(2, 8, 2):
+    statement # Similar to [2, 4, 6] but does not allocate an array.
+for i in range(8, 2, -2):
+    statement # Similar to [8, 6, 4] but does not allocate an array.
+for c in "Hello":
+    print(c) # Iterate through all characters in a String, print every letter on new line.
+for i in 3:
+    statement # Similar to range(3).
+for i in 2.2:
+    statement # Similar to range(ceil(2.2)).
+```
+#### `match`
+类似于在许多其他语言中出现的 `switch` 语句，可以称为大号的`if`语句
+```gdscript
+match x:
+    1:
+        print("It's one!")
+    2:
+        print("It's one times two!")
+    _:
+        print("It's not 1 or 2. I don't care to be honest.")
+```
+如果x=1，则控制台会打印"It's one!"，然后不再执行之后的语句。
+_代表通配符，也就是说如果上面的都不匹配，就执行_下的语句
