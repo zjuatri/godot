@@ -5,9 +5,6 @@ Godot 提供了四种游戏编程语言：GDScript、C# 以及通过 GDExtension
 你可以在一个项目中使用多种语言。例如，在团队中，你可以在 GDScript 中编写游戏逻辑，因为它编写起来很快，并使用 C# 或 C++ 来实现复杂的算法并最大限度地提高其性能。或者你可以使用 GDScript 或 C# 编写所有内容。由你自己决定。
 
 如果你是初学者，推荐从 GDScript 入手。GDScript的语法类似python，容易上手。
-个人极度推荐学习UC Berkeley的[CS61A](https://web.archive.org/web/20240105210336/https://inst.eecs.berkeley.edu/~cs61a/sp21/)课程，可以对编程语言有一个比较系统的了解。
-## 调试代码
-打开godot引擎，在项目中创建一个Node2D节点，给其加脚本，将除了函数的代码写在_ready下，函数代码与ready并列
 ## 标识符
 标识符就是我们编程的时候使用的“名字“ , 给类、接口、**方法（函数）、变量、常量名**，包名等起名字的字符序列
 
@@ -74,6 +71,7 @@ arr[0] = "Hi!" # Replacing value 1 with "Hi!".
 arr.append(4) # Array is now ["Hi!", 2, 3, 4].
 arr.pop_back() # Array is now ["Hi!", 2, 3]
 ```
+[array官方文档](https://docs.godotengine.org/zh-cn/4.x/classes/class_array.html#class-array-method-erase)
 #### 字典(Dictionary)
 键值对的集合，冒号前为键(key)，冒号后为值(value)
 ```gdscript
@@ -111,10 +109,12 @@ var b: int = 5
 ## 常用运算符
 [运算符](https://www.bookstack.cn/read/godot-4.2-zh/17dff0780b8d3fc0.md#%E8%BF%90%E7%AE%97%E7%AC%A6)
 ## 函数
-允许复用的一段代码。
+允许复用的一段代码。按电脑上的"tab"键实现缩进
 ```gdscript
 func my_function(a, b):
-    return a + 2b
+    a = a + b
+    b = 2 * a + b
+    return a + 2 * b
 ```
 调用函数
 ```gdscript
@@ -134,17 +134,19 @@ func my_int_function() -> int:
 全局变量和局部变量
 #### 基本类型
 ```gdscript
-var a = 5
-var b = 5
+var c = 5
+var d = 5
 
 func my_func(a,b):
+    # var a = c
+    # var b = d
     a = 6
     return a + b
 
+my_func(c,d)
 print(a) # 5
 ```
-不要这样写代码！
-在这里，a和b相当于是被复制进去了
+相当于`a`和`b`的值被赋给了`c`和`d`
 #### 引用类型
 ```gdscript
 var a = [1,2,3]
@@ -192,7 +194,7 @@ elif (expression):
 else:
     statement(s)
 ```
-这里的expression一般是bool类型，一般是表判断含义的表达式
+这里的expression一般是`bool`类型，一般是表判断含义的表达式。也可以是其他类型，`0`,`null`代表`false`，其他代表`true`.
 ```gdscript
 if (a > 2):
     a += 2
@@ -211,7 +213,8 @@ else:
 #### 三元表达式
 类似于C语言中`a ? b : c`的语法
 ```gdscript
-var x = (value1) if (expression) else (value2)# 如果expression是true，那表达式的值为value1，否则为value2
+var x = (value1) if (expression) else (value2)
+# 如果expression是true，那表达式的值为value1，否则为value2
 y += 3 if y < 10 else -1
 ```
 可以写的更长
@@ -223,7 +226,6 @@ var fruit = (
         else "orange"
 )
 ```
-但是可读性会降低所以不建议这么写
 #### `in`
 想要检查某个值是否包含在某些容器之中时，可以通过 if 语句与 in 操作符组合来实现：
 ```gdscript
@@ -235,7 +237,6 @@ var arr = ['apple','banana','peach','shxt']
 if 'shxt' in arr:
     arr.erase('shxt') # remove 'shxt' from the array
 ```
-(array官方文档)[./https://docs.godotengine.org/zh-cn/4.x/classes/class_array.html#class-array-method-erase]
 ### 循环句
 #### `while`
 一般的循环通过 while 语法创建，可以使用 break 来跳出整个循环，或者使用 continue 来跳出当前批循环并进入下一轮的循环当中（会在该轮循环将该关键字下方所有在该循环体内的语句全部跳过）：
@@ -258,13 +259,13 @@ for i in dict:
 # range 左闭右开
 
 for i in range(3):
-    statement # Similar to [0, 1, 2] but does not allocate an array.
+    statement # Similar to [0, 1, 2]
 for i in range(1, 3):
-    statement # Similar to [1, 2] but does not allocate an array.
+    statement # Similar to [1, 2]
 for i in range(2, 8, 2):
-    statement # Similar to [2, 4, 6] but does not allocate an array.
+    statement # Similar to [2, 4, 6]
 for i in range(8, 2, -2):
-    statement # Similar to [8, 6, 4] but does not allocate an array.
+    statement # Similar to [8, 6, 4]
 for c in "Hello":
     print(c) # Iterate through all characters in a String, print every letter on new line.
 for i in 3:
@@ -273,7 +274,7 @@ for i in 2.2:
     statement # Similar to range(ceil(2.2)).
 ```
 #### `match`
-类似于在许多其他语言中出现的 `switch` 语句，可以称为大号的`if`语句
+类似于在许多其他语言中出现的 `switch` 语句，但是不用每个分支写`break`，可以称为大号的`if`语句
 ```gdscript
 match x:
     1:
@@ -285,3 +286,9 @@ match x:
 ```
 如果x=1，则控制台会打印"It's one!"，然后不再执行之后的语句。
 _代表通配符，也就是说如果上面的都不匹配，就执行_下的语句
+## 测试代码
+打开godot引擎，在项目中创建一个Node2D节点，给其加脚本，将除了函数的代码写在`_ready`下，函数代码与`_ready`并列
+## 作业
+大家可以写一下以下几道比较经典的练习题
+1. 打印出所有的 "水仙花数 "，所谓 "水仙花数 "是指一个三位数，其各位数字立方和等于该数本身。例如：153是一个 "水仙花数 "，因为$153=1^3＋5^3＋3^3$。
+2. 输入一个正整数n，计算前n项之和：1+1/4+1/7+1/10…+1/(3*n-2)。
