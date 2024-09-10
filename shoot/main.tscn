@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bb63bpsxq74kk"]
+
+[ext_resource type="PackedScene" uid="uid://bywvr6w6tdt8e" path="res://player.tscn" id="1_fdp4w"]
+[ext_resource type="Script" path="res://main.gd" id="1_k6y2x"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_k6y2x")
+
+[node name="Sprite2D" parent="." instance=ExtResource("1_fdp4w")]
+
+[connection signal="shoot" from="Sprite2D" to="." method="_on_player_shoot"]

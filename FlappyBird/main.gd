@@ -2,7 +2,8 @@ extends Node2D
 
 const WIDTH = 960
 const HEIGHT = 720
-var obstacle = preload("res://obstacles.tscn")
+const obstacle = preload("res://obstacles.tscn")
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
